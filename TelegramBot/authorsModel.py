@@ -72,15 +72,22 @@ loaded_model.eval()
 
 base_url_img = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendPhoto"
 base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
-
+correct = "artist"
 
 def authorsGame(update, context) :
+    id = update.effective_chat.id
     update.message.reply_text('Game started! mode: authors')
     with torch.no_grad():
         compScore = 0
         userScore = 0
 
         for i in range(10):
+
+            parameters = {
+                "chat_id": id,
+                "text": 'Level ' + str(i + 1)
+            }
+            resp = requests.get(base_url_txt, data=parameters)
 
             j = randint(1, test_size)
             if j <= 69:
@@ -96,8 +103,7 @@ def authorsGame(update, context) :
 
             my_file = open(img_path, "rb")
             parameters = {
-                "chat_id": "627898835",
-                #"caption": test_data[j]["label"]
+                "chat_id": id,
             }
             files = {
                 "photo": my_file
@@ -110,13 +116,13 @@ def authorsGame(update, context) :
                 compScore += 1
 
             parameters = {
-                "chat_id": "627898835",
-                "text": 'Level ' + str(i+1) + '\n' + "Computer's guess: " + authors_test.classes[int(pred[j])] +
-                        '\n' + "Correct: " + authors_test.classes[int(true[j])] + '\n' + "Computer score = "
-                        + str(compScore)
+                "chat_id": "388710298",
+                "text": "Computer's guess: " + authors_test.classes[int(pred[j])] +
+                        '\n' + "Correct: " + authors_test.classes[int(true[j])] +
+                        '\n' + "Computer score = " + str(compScore)
             }
             resp = requests.get(base_url_txt, data=parameters)
 
-            print("Level ", i)
+            print("Level ", i+1)
             print("Computer's guess: ", authors_test.classes[int(pred[j])])
             print("Computer score = ", compScore)
