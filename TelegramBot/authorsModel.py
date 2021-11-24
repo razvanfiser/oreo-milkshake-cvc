@@ -77,19 +77,20 @@ correct = "artist"
 def authorsGame(update, context) :
     id = update.effective_chat.id
     update.message.reply_text('Game started! mode: authors')
-    with torch.no_grad():
-        compScore = 0
-        userScore = 0
+    compScore = 0
+    userScore = 0
 
-        for i in range(10):
+    for i in range(10):
 
-            parameters = {
-                "chat_id": id,
-                "text": 'Level ' + str(i + 1)
-            }
-            resp = requests.get(base_url_txt, data=parameters)
+        parameters = {
+            "chat_id": id,
+            "text": 'Level ' + str(i + 1)
+        }
+        resp = requests.get(base_url_txt, data=parameters)
 
-            j = randint(1, test_size)
+        with torch.no_grad():
+
+            j = randint(1, test_size-1)
             if j <= 69:
                 img_path = "..\\author_classification_ds\\authors_test\\authors_test\\fernand_leger\\0 (" + str(j) + ").jpg"
             elif j<=145:
@@ -115,14 +116,14 @@ def authorsGame(update, context) :
             if pred[j] == true[j]:
                 compScore += 1
 
-            parameters = {
-                "chat_id": "388710298",
-                "text": "Computer's guess: " + authors_test.classes[int(pred[j])] +
-                        '\n' + "Correct: " + authors_test.classes[int(true[j])] +
-                        '\n' + "Computer score = " + str(compScore)
-            }
-            resp = requests.get(base_url_txt, data=parameters)
+        parameters = {
+            "chat_id": id,
+            "text": "Computer's guess: " + authors_test.classes[int(pred[j])] +
+                    '\n' + "Correct: " + authors_test.classes[int(true[j])] +
+                    '\n' + "Computer score = " + str(compScore)
+        }
+        resp = requests.get(base_url_txt, data=parameters)
 
-            print("Level ", i+1)
-            print("Computer's guess: ", authors_test.classes[int(pred[j])])
-            print("Computer score = ", compScore)
+        print("Level ", i+1)
+        print("Computer's guess: ", authors_test.classes[int(pred[j])])
+        print("Computer score = ", compScore)
