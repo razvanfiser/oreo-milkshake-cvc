@@ -1,0 +1,2 @@
+API_KEY = '2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc'
+BASE_URL = 'https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc'
