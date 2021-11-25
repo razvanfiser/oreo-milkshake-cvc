@@ -1,18 +1,17 @@
 import os
-from random import random, randint
+from random import randint
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import CallbackContext
 from torchvision.datasets import ImageFolder
 import numpy as np
-import pandas as pd
-import torch
 import torchvision
-from torchvision import transforms, utils
+from torchvision import transforms
 import torch.nn as nn
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import torch.optim as optim
-import matplotlib.pyplot as plt
 import requests
-import time
+import constants
 
 test_path = os.path.join(os.getcwd(), "..\\author_classification_ds\\authors_test\\authors_test")
 
@@ -60,8 +59,7 @@ model.to(device=device)
 params = [p for p in model.parameters() if p.requires_grad]
 optimizer = optim.Adam(params, lr=0.001)
 
-test_loader = torch.utils.data.DataLoader(test_data, batch_size=64,
-                                          shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_data, batch_size=64, shuffle=True)
 
 loaded_model = get_model(n_classes=5).to(device=device)
 loaded_model.load_state_dict(torch.load(os.path.join(os.getcwd(), "..\\models\\authors_model_resnet101_augment.pth"), map_location=torch.device('cpu')))
@@ -69,16 +67,39 @@ loaded_model.load_state_dict(torch.load(os.path.join(os.getcwd(), "..\\models\\a
 pred = np.zeros(len(test_data))
 true = np.zeros(len(test_data))
 loaded_model.eval()
+comp_score = 0
+user_score = 0
 
-base_url_img = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendPhoto"
-base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
-correct = "artist"
+def get_author(ind, chat_id) :
+    global comp_score
+    with torch.no_grad():
+        out = loaded_model(test_data[ind]["pic"].unsqueeze(0).to(device=device))
+        pred[ind] = torch.argmax(out)
+        true[ind] = test_data[ind]["label"]
+        if pred[ind] == true[ind]:
+            comp_score += 1
 
-def authorsGame(update, context) :
+        parameters = {
+            "chat_id": chat_id,
+            "text": "Correct: " + authors_test.classes[int(true[ind])] +
+                    '\n' + "Computer's guess: " + authors_test.classes[int(pred[ind])]
+        }
+    resp = requests.get(constants.base_url_txt, data=parameters)
+
+
+def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+
+    query.edit_message_text(text=f"Selected option: {query.data}")
+    print(query.data)
+
+
+def authors_game(update: Update, context: CallbackContext):
+
     id = update.effective_chat.id
-    update.message.reply_text('Game started! mode: authors')
-    compScore = 0
-    userScore = 0
+
+    update.message.reply_text('Game started! mode: authors' + '\n' + "Please guess the authors of the following images:")
 
     for i in range(10):
 
@@ -86,44 +107,47 @@ def authorsGame(update, context) :
             "chat_id": id,
             "text": 'Level ' + str(i + 1)
         }
-        resp = requests.get(base_url_txt, data=parameters)
+        resp = requests.get(constants.base_url_txt, data=parameters)
+        j = randint(1, test_size - 1)
 
-        with torch.no_grad():
+        if j <= 69:
+            img_path = "..\\author_classification_ds\\authors_test\\authors_test\\fernand_leger\\0 (" + str(j) + ").jpg"
+        elif j<=145:
+            img_path = "..\\author_classification_ds\\authors_test\\authors_test\\ivan_aivazovsky\\1 (" + str(j-69) + ").jpg"
+        elif j<=220:
+            img_path = "..\\author_classification_ds\\authors_test\\authors_test\\rembrandt\\2 (" + str(j-145) + ").jpg"
+        elif j<=291:
+            img_path = "..\\author_classification_ds\\authors_test\\authors_test\\salvador_dali\\3 (" + str(j-220) + ").jpg"
+        else:
+            img_path = "..\\author_classification_ds\\authors_test\\authors_test\\vincent_van_gogh\\4 (" + str(j-291) + ").jpg"
 
-            j = randint(1, test_size-1)
-            if j <= 69:
-                img_path = "..\\author_classification_ds\\authors_test\\authors_test\\fernand_leger\\0 (" + str(j) + ").jpg"
-            elif j<=145:
-                img_path = "..\\author_classification_ds\\authors_test\\authors_test\\ivan_aivazovsky\\1 (" + str(j-69) + ").jpg"
-            elif j<=220:
-                img_path = "..\\author_classification_ds\\authors_test\\authors_test\\rembrandt\\2 (" + str(j-145) + ").jpg"
-            elif j<=291:
-                img_path = "..\\author_classification_ds\\authors_test\\authors_test\\salvador_dali\\3 (" + str(j-220) + ").jpg"
-            else:
-                img_path = "..\\author_classification_ds\\authors_test\\authors_test\\vincent_van_gogh\\4 (" + str(j-291) + ").jpg"
-
-            my_file = open(img_path, "rb")
-            parameters = {
-                "chat_id": id,
-            }
-            files = {
-                "photo": my_file
-            }
-            resp = requests.get(base_url_img, data=parameters, files=files)
-            out = loaded_model(test_data[j]["pic"].unsqueeze(0).to(device=device))
-            pred[j] = torch.argmax(out)
-            true[j] = test_data[j]["label"]
-            if pred[j] == true[j]:
-                compScore += 1
-
+        my_file = open(img_path, "rb")
         parameters = {
             "chat_id": id,
-            "text": "Computer's guess: " + authors_test.classes[int(pred[j])] +
-                    '\n' + "Correct: " + authors_test.classes[int(true[j])] +
-                    '\n' + "Computer score = " + str(compScore)
         }
-        resp = requests.get(base_url_txt, data=parameters)
+        files = {
+            "photo": my_file
+        }
+        resp = requests.get(constants.base_url_img, data=parameters, files=files)
 
-        print("Level ", i+1)
-        print("Computer's guess: ", authors_test.classes[int(pred[j])])
-        print("Computer score = ", compScore)
+        keyboard = [
+            [
+                InlineKeyboardButton("Fernand Leger", callback_data="Fernand Leger"),
+                InlineKeyboardButton("Ivan Aivazovsky", callback_data="Ivan Aivazovsky"),
+                InlineKeyboardButton("Rembrandt", callback_data="Rembrandt")
+            ],
+            [
+                InlineKeyboardButton("Salvador Dali", callback_data='Salvador Dali'),
+                InlineKeyboardButton("Vincent Van Gogh", callback_data='Vincent Van Gogh'),
+            ],
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        update.message.reply_text('Please choose:', reply_markup=reply_markup)
+
+        get_author(j, id)
+    print(comp_score)
+
+
+
