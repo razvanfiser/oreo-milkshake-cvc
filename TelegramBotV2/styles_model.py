@@ -11,7 +11,7 @@ import requests
 
 base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
 
-test_path = os.path.join(os.getcwd(), "..\\author_classification_ds\\authors_test\\authors_test")
+test_path = os.path.join(os.getcwd(), "..\\styles_dataset\\styles_test\\styles_test")
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -21,11 +21,11 @@ transform = transforms.Compose([
         std=[0.229, 0.224, 0.225]
     )
 ])
-authors_test = ImageFolder(test_path, transform=transform)
+styles_test = ImageFolder(test_path, transform=transform)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
-class Authors_Test(Dataset):
+class Styles_Test(Dataset):
     def __init__(self, X):
         self.X = X
 
@@ -37,8 +37,8 @@ class Authors_Test(Dataset):
         return sample
 
 
-test_data = Authors_Test(authors_test)
-test_size = len(authors_test)
+test_data = Styles_Test(styles_test)
+test_size = len(styles_test)
 test_data = torch.utils.data.Subset(test_data, np.arange(test_size))
 
 
@@ -49,7 +49,7 @@ def get_model(n_classes):
     return model
 
 
-model = get_model(len(authors_test.classes)).to(device=device)
+model = get_model(len(styles_test.classes)).to(device=device)
 
 model.to(device=device)
 
@@ -59,7 +59,7 @@ optimizer = optim.Adam(params, lr=0.001)
 test_loader = torch.utils.data.DataLoader(test_data, batch_size=64, shuffle=True)
 
 loaded_model = get_model(n_classes=5).to(device=device)
-loaded_model.load_state_dict(torch.load(os.path.join(os.getcwd(), "..\\models\\authors_model_resnet101_augment.pth"), map_location=torch.device('cpu')))
+loaded_model.load_state_dict(torch.load(os.path.join(os.getcwd(), "..\\models\\styles_model_resnet101_augment.pth"), map_location=torch.device('cpu')))
 
 pred = np.zeros(len(test_data))
 true = np.zeros(len(test_data))
