@@ -116,8 +116,8 @@ def computer_guess_authors(message, chat_id, ind, level):
         msg = client.send_message(
             message.chat.id,
             "Level: " + str(level+1) +
-            '\n' + "Correct: " + authors_model.authors_test.classes[int(authors_model.true[ind])] +
-            '\n' + "Computer's guess: " + authors_model.authors_test.classes[int(authors_model.pred[ind])] +
+            '\n' + "Correct: " + translate(authors_model.authors_test.classes[int(authors_model.true[ind])]) +
+            '\n' + "Computer's guess: " + translate(authors_model.authors_test.classes[int(authors_model.pred[ind])]) +
             '\n' + "Score: " + str(USER_SCORE) + ":" + str(COMPUTER_SCORE),
             reply_markup=rmk)
         level += 1
@@ -162,8 +162,8 @@ def computer_guess_styles(message, chat_id, ind, level):
         msg = client.send_message(
             message.chat.id,
             "Level: " + str(level+1) +
-            '\n' + "Correct: " + styles_model.styles_test.classes[int(styles_model.true[ind])] +
-            '\n' + "Computer's guess: " + styles_model.styles_test.classes[int(styles_model.pred[ind])] +
+            '\n' + "Correct: " + translate(styles_model.styles_test.classes[int(styles_model.true[ind])]) +
+            '\n' + "Computer's guess: " + translate(styles_model.styles_test.classes[int(styles_model.pred[ind])]) +
             '\n' + "Score: " + str(USER_SCORE) + ":" + str(COMPUTER_SCORE),
             reply_markup=rmk)
         level += 1
@@ -171,10 +171,32 @@ def computer_guess_styles(message, chat_id, ind, level):
             client.register_next_step_handler(message, styles_game, level)
         else:
             if USER_SCORE < COMPUTER_SCORE:
-                client.send_message(message.chat.id, "Game Over!"+'\n'+"Computer won!"+'\n'+"Better luck next time!")
+                client.send_message(message.chat.id, "Game Over!"+'\n'+"Computer won"+'\n'+"Better luck next time!")
             else:
                 client.send_message(message.chat.id, "Game Over!"+'\n'+"You won!!!"+'\n'+"Want to do it again?")
             client.register_next_step_handler(message, application)
 
+
+def translate(word):
+    if word == "fernand_leger":
+        return "Fernand Leger"
+    if word == "ivan_aivazovsky":
+        return "Ivan Aivazovsky"
+    if word == "rembrandt":
+        return "Rembrandt"
+    if word == "salvador_dali":
+        return "Salvador Dali"
+    if word == "vincent_van_gogh":
+        return "Vincent Van Gogh"
+    if word == "abstract_expressionism":
+        return "Abstract Expressionism"
+    if word == "baroque":
+        return "Baroque"
+    if word == "cubism":
+        return "Cubism"
+    if word == "romanticism":
+        return "Romanticism"
+    if word == "ukiyo-e":
+        return "Ukiyo-e"
 
 client.polling()
