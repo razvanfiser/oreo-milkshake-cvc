@@ -1,12 +1,11 @@
 from random import randint
-import requests
 import telebot
 import torch
 from telebot import types
 import authors_model
 import styles_model
 
-client = telebot.TeleBot("2145831588:AAGAxm297wnYw3XHHyPQyqsmv9IGF9psW6s")
+client = telebot.TeleBot("2113002847:AAExiWKJATrnpbx9koHwZp0cZOehGJibccA")
 base_url_img = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendPhoto"
 base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
 USER_SCORE = 0

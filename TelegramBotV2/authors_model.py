@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch
 from torch.utils.data import Dataset
 import torch.optim as optim
-import requests
 
 base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
 
