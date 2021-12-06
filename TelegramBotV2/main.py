@@ -8,9 +8,6 @@ import styles_model
 client = telebot.TeleBot("2113002847:AAExiWKJATrnpbx9koHwZp0cZOehGJibccA")
 base_url_img = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendPhoto"
 base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
-USER_SCORE = 0
-COMPUTER_SCORE = 0
-i=0
 
 
 @client.message_handler(commands=["start"])
@@ -22,72 +19,99 @@ def application(message):
 
 
 def user_answer(message):
-    global USER_SCORE
-    global COMPUTER_SCORE
-    global i
     if message.text == "Authors":
-        msg = client.send_message(message.chat.id, "Game Started! Mode: Authors."+'\n'+"Press any key to start playing")
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Game Started! Mode: Authors."+'\n'+"Press any key to start playing", reply_markup=rmk)
         i = 0
         USER_SCORE = 0
         COMPUTER_SCORE = 0
-        client.register_next_step_handler(msg, authors_game, i)
+        client.register_next_step_handler(msg, authors_game, i, USER_SCORE, COMPUTER_SCORE)
     elif message.text == "Styles":
-        msg = client.send_message(message.chat.id, "Game Started! Mode: Styles."+'\n'+"Press any key to start playing")
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Game Started! Mode: Styles."+'\n'+"Press any key to start playing", reply_markup=rmk)
         i = 0
         USER_SCORE = 0
         COMPUTER_SCORE = 0
-        client.register_next_step_handler(msg, styles_game, i)
-
-
-def authors_game(message, level):
-    k = randint(1, 370)
-    if k <= 69:
-        img_path = "..\\author_classification_ds\\authors_test\\authors_test\\fernand_leger\\0 ("+str(k)+").jpg"
-    elif k <= 145:
-        img_path = "..\\author_classification_ds\\authors_test\\authors_test\\ivan_aivazovsky\\1 ("+str(k-69)+").jpg"
-    elif k <= 220:
-        img_path = "..\\author_classification_ds\\authors_test\\authors_test\\rembrandt\\2 ("+str(k-145)+").jpg"
-    elif k <= 291:
-        img_path = "..\\author_classification_ds\\authors_test\\authors_test\\salvador_dali\\3 ("+str(k-220)+").jpg"
+        client.register_next_step_handler(msg, styles_game, i, USER_SCORE, COMPUTER_SCORE)
+    elif message.text == "/start":
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Starting again, press any key to continue", reply_markup=rmk)
+        client.register_next_step_handler(msg, application)
+    elif message.text =="/exit":
+        msg = client.send_message(message.chat.id, "Game stopped! Type /start to start again")
     else:
-        img_path = "..\\author_classification_ds\\authors_test\\authors_test\\vincent_van_gogh\\4 ("+str(k-291)+").jpg"
-    my_file = open(img_path, "rb")
-    client.send_photo(message.chat.id, my_file)
-
-    rmk = types.ReplyKeyboardMarkup()
-    rmk.add(types.KeyboardButton("Fernand Leger"), types.KeyboardButton("Ivan Aivazovsky"),
-            types.KeyboardButton("Rembrandt"), types.KeyboardButton("Salvador Dali"),
-            types.KeyboardButton("Vincent Van Gogh"))
-    msg = client.send_message(message.chat.id, "Guess the author!", reply_markup=rmk)
-    client.register_next_step_handler(msg, computer_guess_authors, msg.chat.id, k, level)
+        msg = client.send_message(message.chat.id, "Command unrecognized, try again!")
+        client.register_next_step_handler(msg, user_answer)
 
 
-def styles_game(message, level):
-    k = randint(1, 1186)
-    if k <= 240:
-        img_path = "..\\styles_dataset\\styles_test\\styles_test\\abstract_expressionism\\0 ("+str(k)+").jpg"
-    elif k <= 480:
-        img_path = "..\\styles_dataset\\styles_test\\styles_test\\baroque\\1 ("+str(k-240)+").jpg"
-    elif k <= 720:
-        img_path = "..\\styles_dataset\\styles_test\\styles_test\\cubism\\2 ("+str(k-480)+").jpg"
-    elif k <= 960:
-        img_path = "..\\styles_dataset\\styles_test\\styles_test\\romanticism\\3 ("+str(k-720)+").jpg"
+def authors_game(message, level, U_S, C_S):
+    if message.text == "/start":
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Starting again, press any key to continue", reply_markup=rmk)
+        client.register_next_step_handler(msg, application)
+    elif message.text =="/exit":
+        msg = client.send_message(message.chat.id, "Game stopped! Type /start to start again")
     else:
-        img_path = "..\\styles_dataset\\styles_test\\styles_test\\ukiyo-e\\4 ("+str(k-960)+").jpg"
-    my_file = open(img_path, "rb")
-    client.send_photo(message.chat.id, my_file)
+        k = randint(1, 371)
+        print(k)
+        if k <= 69:
+            img_path = "../author_classification_ds/authors_test/authors_test/fernand_leger/0 ("+str(k)+").jpg"
+        elif k <= 145:
+            img_path = "../author_classification_ds/authors_test/authors_test/ivan_aivazovsky/1 ("+str(k-69)+").jpg"
+        elif k <= 220:
+            img_path = "../author_classification_ds/authors_test/authors_test/rembrandt/2 ("+str(k-145)+").jpg"
+        elif k <= 291:
+            img_path = "../author_classification_ds/authors_test/authors_test/salvador_dali/3 ("+str(k-220)+").jpg"
+        else:
+            img_path = "../author_classification_ds/authors_test/authors_test/vincent_van_gogh/4 ("+str(k-291)+").jpg"
+        my_file = open(img_path, "rb")
+        client.send_photo(message.chat.id, my_file)
 
-    rmk = types.ReplyKeyboardMarkup()
-    rmk.add(types.KeyboardButton("Abstract Expressionism"), types.KeyboardButton("Baroque"),
-            types.KeyboardButton("Cubism"), types.KeyboardButton("Romanticism"),
-            types.KeyboardButton("Ukiyo-e"))
-    msg = client.send_message(message.chat.id, "Guess the style!", reply_markup=rmk)
-    client.register_next_step_handler(msg, computer_guess_styles, msg.chat.id, k, level)
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Fernand Leger"), types.KeyboardButton("Ivan Aivazovsky"),
+                types.KeyboardButton("Rembrandt"), types.KeyboardButton("Salvador Dali"),
+                types.KeyboardButton("Vincent Van Gogh"))
+        msg = client.send_message(message.chat.id, "Guess the author!", reply_markup=rmk)
+        client.register_next_step_handler(msg, computer_guess_authors, msg.chat.id, k-1, level, U_S, C_S)
 
 
-def computer_guess_authors(message, chat_id, ind, level):
-    global COMPUTER_SCORE
-    global USER_SCORE
+def styles_game(message, level, U_S, C_S):
+    if message.text == "/start":
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Starting again, press any key to continue", reply_markup=rmk)
+        client.register_next_step_handler(msg, application)
+    elif message.text =="/exit":
+        msg = client.send_message(message.chat.id, "Game stopped! Type /start to start again")
+    else:
+        k = randint(1, 1187)
+        print(k)
+        if k <= 240:
+            img_path = "../styles_dataset/styles_test/styles_test/abstract_expressionism/0 ("+str(k)+").jpg"
+        elif k <= 480:
+            img_path = "../styles_dataset/styles_test/styles_test/baroque/1 ("+str(k-240)+").jpg"
+        elif k <= 720:
+            img_path = "../styles_dataset/styles_test/styles_test/cubism/2 ("+str(k-480)+").jpg"
+        elif k <= 960:
+            img_path = "../styles_dataset/styles_test/styles_test/romanticism/3 ("+str(k-720)+").jpg"
+        else:
+            img_path = "../styles_dataset/styles_test/styles_test/ukiyo-e/4 ("+str(k-960)+").jpg"
+        my_file = open(img_path, "rb")
+        client.send_photo(message.chat.id, my_file)
+
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Abstract Expressionism"), types.KeyboardButton("Baroque"),
+                types.KeyboardButton("Cubism"), types.KeyboardButton("Romanticism"),
+                types.KeyboardButton("Ukiyo-e"))
+        msg = client.send_message(message.chat.id, "Guess the style!", reply_markup=rmk)
+        client.register_next_step_handler(msg, computer_guess_styles, msg.chat.id, k-1, level, U_S, C_S)
+
+
+def computer_guess_authors(message, chat_id, ind, level, U_S, C_S):
 
     user_option = 111
     if message.text == "Fernand Leger":
@@ -100,6 +124,16 @@ def computer_guess_authors(message, chat_id, ind, level):
         user_option = 3
     elif message.text == "Vincent Van Gogh":
         user_option = 4
+    elif message.text == "/start":
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Starting again, press any key to continue", reply_markup=rmk)
+        client.register_next_step_handler(msg, application)
+    elif message.text =="/exit":
+        msg = client.send_message(message.chat.id, "Game stopped! Type /start to start again")
+    else:
+        msg = client.send_message(message.chat.id, "Command unrecognized, try again!")
+        client.register_next_step_handler(msg, computer_guess_authors, msg.chat.id, ind, level, U_S, C_S)
 
     if user_option != 111:
         with torch.no_grad():
@@ -107,9 +141,9 @@ def computer_guess_authors(message, chat_id, ind, level):
             authors_model.pred[ind] = torch.argmax(out)
             authors_model.true[ind] = authors_model.test_data[ind]["label"]
             if authors_model.pred[ind] == authors_model.true[ind]:
-                COMPUTER_SCORE += 1
+                C_S += 1
             if user_option == authors_model.true[ind]:
-                USER_SCORE += 1
+                U_S += 1
 
         rmk = types.ReplyKeyboardMarkup()
         rmk.add(types.KeyboardButton("Continue"))
@@ -118,22 +152,20 @@ def computer_guess_authors(message, chat_id, ind, level):
             "Level: " + str(level+1) +
             '\n' + "Correct: " + translate(authors_model.authors_test.classes[int(authors_model.true[ind])]) +
             '\n' + "Computer's guess: " + translate(authors_model.authors_test.classes[int(authors_model.pred[ind])]) +
-            '\n' + "Score: " + str(USER_SCORE) + ":" + str(COMPUTER_SCORE),
+            '\n' + "Score: " + str(U_S) + ":" + str(C_S),
             reply_markup=rmk)
         level += 1
         if level < 10:
-            client.register_next_step_handler(message, authors_game, level)
+            client.register_next_step_handler(message, authors_game, level, U_S, C_S)
         else:
-            if(USER_SCORE<COMPUTER_SCORE):
+            if U_S < C_S:
                 client.send_message(message.chat.id, "Game Over!"+'\n'+"Computer won!"+'\n'+"Better luck next time!")
             else:
                 client.send_message(message.chat.id, "Game Over!"+'\n'+"You won!!!"+'\n'+"Want to do it again?")
             client.register_next_step_handler(message, application)
 
 
-def computer_guess_styles(message, chat_id, ind, level):
-    global COMPUTER_SCORE
-    global USER_SCORE
+def computer_guess_styles(message, chat_id, ind, level, U_S, C_S):
 
     user_option = 111
     if message.text == "Abstract Expressionism":
@@ -146,6 +178,16 @@ def computer_guess_styles(message, chat_id, ind, level):
         user_option = 3
     elif message.text == "Ukiyo-e":
         user_option = 4
+    elif message.text == "/start":
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Continue"))
+        msg = client.send_message(message.chat.id, "Starting again, press any key to continue", reply_markup=rmk)
+        client.register_next_step_handler(msg, application)
+    elif message.text == "/exit":
+        msg = client.send_message(message.chat.id, "Game stopped! Type /start to start again")
+    else:
+        msg = client.send_message(message.chat.id, "Command unrecognized, try again!")
+        client.register_next_step_handler(msg, computer_guess_styles, msg.chat.id, ind, level, U_S, C_S,)
 
     if user_option != 111:
         with torch.no_grad():
@@ -153,9 +195,9 @@ def computer_guess_styles(message, chat_id, ind, level):
             styles_model.pred[ind] = torch.argmax(out)
             styles_model.true[ind] = styles_model.test_data[ind]["label"]
             if styles_model.pred[ind] == styles_model.true[ind]:
-                COMPUTER_SCORE += 1
+                C_S += 1
             if user_option == styles_model.true[ind]:
-                USER_SCORE += 1
+                U_S += 1
 
         rmk = types.ReplyKeyboardMarkup()
         rmk.add(types.KeyboardButton("Continue"))
@@ -164,13 +206,13 @@ def computer_guess_styles(message, chat_id, ind, level):
             "Level: " + str(level+1) +
             '\n' + "Correct: " + translate(styles_model.styles_test.classes[int(styles_model.true[ind])]) +
             '\n' + "Computer's guess: " + translate(styles_model.styles_test.classes[int(styles_model.pred[ind])]) +
-            '\n' + "Score: " + str(USER_SCORE) + ":" + str(COMPUTER_SCORE),
+            '\n' + "Score: " + str(U_S) + ":" + str(C_S),
             reply_markup=rmk)
         level += 1
         if level < 10:
-            client.register_next_step_handler(message, styles_game, level)
+            client.register_next_step_handler(message, styles_game, level, U_S, C_S)
         else:
-            if USER_SCORE < COMPUTER_SCORE:
+            if U_S < C_S:
                 client.send_message(message.chat.id, "Game Over!"+'\n'+"Computer won"+'\n'+"Better luck next time!")
             else:
                 client.send_message(message.chat.id, "Game Over!"+'\n'+"You won!!!"+'\n'+"Want to do it again?")
