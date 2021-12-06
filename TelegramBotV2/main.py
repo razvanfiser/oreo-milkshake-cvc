@@ -12,10 +12,13 @@ base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJ
 
 @client.message_handler(commands=["start"])
 def application(message):
-    rmk = types.ReplyKeyboardMarkup()
-    rmk.add(types.KeyboardButton("Authors"), types.KeyboardButton("Styles"))
-    msg = client.send_message(message.chat.id, "Hi! Select Game Type!", reply_markup=rmk)
-    client.register_next_step_handler(msg, user_answer)
+    if message.text == "/exit":
+        msg = client.send_message(message.chat.id, "Game stopped! Type /start to start again")
+    else:
+        rmk = types.ReplyKeyboardMarkup()
+        rmk.add(types.KeyboardButton("Authors"), types.KeyboardButton("Styles"))
+        msg = client.send_message(message.chat.id, "Hi! Select Game Type!", reply_markup=rmk)
+        client.register_next_step_handler(msg, user_answer)
 
 
 def user_answer(message):
