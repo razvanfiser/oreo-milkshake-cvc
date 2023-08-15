@@ -5,9 +5,9 @@ from telebot import types
 import authors_model
 import styles_model
 
-client = telebot.TeleBot("2113002847:AAExiWKJATrnpbx9koHwZp0cZOehGJibccA")
-base_url_img = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendPhoto"
-base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
+client = telebot.TeleBot("TELEGRAM BOT TOKEN")
+base_url_img = "https://api.telegram.org/TOKEN/sendPhoto"
+base_url_txt = "https://api.telegram.org/TOKEN/sendMessage"
 
 
 @client.message_handler(commands=["start"])
