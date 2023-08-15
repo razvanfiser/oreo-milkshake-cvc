@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import Dataset
 import torch.optim as optim
 
-base_url_txt = "https://api.telegram.org/bot2121589320:AAFe0WiStJID-1QTs2Gfmn6vJqzU2AjwMPc/sendMessage"
+base_url_txt = "https://api.telegram.org/TOKEN/sendMessage"
 
 test_path = os.path.join(os.getcwd(), "..\\styles_dataset\\styles_test\\styles_test")
 
